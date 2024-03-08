@@ -1,0 +1,30 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches:    
+      - 'develop'
+      - 'staging'
+      - 'UAT'
+      - 'production'
+  pull_request:
+    branches:
+      - 'develop'
+      - 'staging'
+      - 'UAT'
+      - 'production'
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Set ENV
+      run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      
+    - uses: actions/checkout@v3
+    
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag ${{ github.event.repository.name }}:${{ env.RELEASE_VERSION }}_$(date +%s)
